@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static '/css/teacher.css' %}">
+    <link rel="stylesheet" href="{% static '/css/dashboard.css' %}">
+    <link rel="shortcut icon" href="{% static '/img/favicon.png' %}" type="image/png">
+    <title>Teacher - Dashboard</title>
+</head>
+<nav>
+    <div class="nav-title">
+        <a href="{% url "home" %}">Learnet</a>
+    </div>
+    <div class="nav-links">
+        <ul class="nav-menu">
+            <li><a href="#" class="nav-link">Dashboard</a></li>
+            <li><a href="#" class="nav-link">Add Course</a></li>
+            <li><a href="#" class="nav-link">Contact</a></li>
+            {% if user.is_authenticated %}
+            <li class="profile-img">
+                <img src="{% static 'img/profile.jpg' %}" alt="Profile Image">
+                <ul class="profile-links">
+                    <li><a href="{% url "teacher_dashboard" %}">Dashboard</a></li>
+                    <li class="login"><a href="{% url 'logout' %}">Log-Out</a></li>
+                </ul>
+            </li>
+            {% else %}
+                <li class="login"><a href="{% url 'login' %}" class="nav-link">Log-In</a></li>
+            {% endif %}
+        </ul>
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </div>
+</nav>
+
+<body>
+    <div class="container">
+        <div class="container-content">
+            <div class="std-courses">
+                <div class="course-head">
+                    <div>
+                        <h1>Your Courses</h1>
+                    </div>
+                {% if cousre is None %}
+                    <div class="no-course">
+                        <h2>You have not enrolled in any courses <a href="#" class="enroll">Click here </a>to enroll
+                        </h2>
+                    </div>
+                {% else %}
+                </div>
+                <div class="course-container">
+                    <div class="course-card">
+                        <div>
+                            <img src="/img/chemistry.png" alt="Chemistry course">
+                        </div>
+                        <div>
+                            <h1>Course</h1>
+                            <div class="course-link">
+                                <p class="delete" onclick="showDelete(this)">Delete</p>
+                                <a href="#" class="enroll">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div>
+                            <img src="/img/chemistry.png" alt="Chemistry course">
+                        </div>
+                        <div>
+                            <h1>Course</h1>
+                            <div class="course-link">
+                                <p class="delete" onclick="showDelete(this)">Delete</p>
+                                <a href="#" class="enroll">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div>
+                            <img src="/img/chemistry.png" alt="Chemistry course">
+                        </div>
+                        <div>
+                            <h1>Course</h1>
+                            <div class="course-link">
+                                <p class="delete" onclick="showDelete(this)">Delete</p>
+                                <a href="#" class="enroll">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-card">
+                        <div>
+                            <img src="/img/chemistry.png" alt="Chemistry course">
+                        </div>
+                        <div>
+                            <h1>Course</h1>
+                            <div class="course-link">
+                                <p class="delete" onclick="showDelete(this)">Delete</p>
+                                <a href="#" class="enroll">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="glass-card-container">
+                            <div class="glass-card-title">
+                                <h1>Are you sure you want to delete?</h1>
+                            </div>
+                            <div class="glass-card-links">
+                                <div>
+                                    <input type="button" value="Cancel" onclick="hideDelete()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="more-course">
+                    <a href="/course/manycourse.html">View More</a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="user-information">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="personal-details">
+                        <div class="personal-details-content">
+                            <div class="personal-head">
+                                <h1>Personal Details</h1>
+                            </div>
+                            <div class="personal-body">
+                                <div class="details">
+                                    <div class="profile-picture-field">
+                                        <img class="profile-picture" src="{{ pic.profilepic.url }}">
+                                        <input type="file" name="profilepic" accept="image/*" id="id_profilepic" value="{{ pic.profilepic.url }}">
+                                    </div>
+                                    <div>
+                                        <div class="std-name">
+                                            {{ form.first_name }}
+                                            {{ form.last_name }}
+                                        </div>
+                                        <div>
+                                            {{ form.phone }}
+                                        </div>
+                                        {% if error %}
+                                        <div class="error">
+                                            <p>{{ error }}</p>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <button class="change-pass"><a href="#">GoTo Change Password</a></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-address">
+                            <div class="address">
+                                <h1>Address</h1>
+                                {{ form.city }}
+                                {{ form.district }}
+                                {{ form.state }}
+                            </div>
+                        </div>
+                        <div class="user-edu">
+                            <h1>Education</h1>
+                            {{ form.edubackground }}
+                        </div>
+                        <div>
+                            {{ form.teachexp }}
+                        </div>
+                        <div class="update-details">
+                            <button type="submit">Update Details</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="{% static '/js/script.js' %}"></script>
+
+</html>
