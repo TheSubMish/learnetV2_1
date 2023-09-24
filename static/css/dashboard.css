@@ -82,7 +82,7 @@ h2 {
 }
 
 .personal-details .preference .select-preference .categories {
-    width: fit-content;
+    width: 200px;
     margin: 10px 0;
     display: flex;
     flex-wrap: wrap;
@@ -103,6 +103,7 @@ h2 {
 .personal-details .preference .select-preference .categories p label {
     color: white;
     text-transform: uppercase;
+    word-wrap: break-word;
 }
 
 .personal-details .update-details button{
@@ -119,6 +120,12 @@ h2 {
     color: #ff6161;
     padding: 10px 0;
     text-align: center;
+}
+
+@media (min-width: 650px){
+    .personal-details .preference .select-preference .categories {
+        width: fit-content;
+    }
 }
 
 @media (min-width:900px) {

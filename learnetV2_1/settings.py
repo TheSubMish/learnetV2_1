@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'userlog',
     'student',
     'teacher',
+    'course',
 ]
 
 AUTH_USER_MODEL = 'userlog.CustomUser'

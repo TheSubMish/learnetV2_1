@@ -17,7 +17,6 @@ def get_user_information(currentuser,currentuserinfo):
             'edubackground': currentuserinfo.edubackground,
             'teachexp': currentuserinfo.teachexp
         })
-        print(currentuserinfo.teachexp)
     else:
         userform = UserInformationForm(initial={
             'first_name': currentuser.first_name,

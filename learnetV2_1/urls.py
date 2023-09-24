@@ -8,6 +8,7 @@ urlpatterns = [
     path('',include('userlog.urls')),
     path('',include('student.urls')),
     path('',include('teacher.urls')),
+    path('',include('course.urls')),
 ]
 
 urlpatterns += static(STATIC_URL,document_root=STATICFILES_DIRS)

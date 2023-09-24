@@ -15,8 +15,8 @@
     </div>
     <div class="nav-links">
         <ul class="nav-menu">
-            <li><a href="#" class="nav-link">Dashboard</a></li>
-            <li><a href="#" class="nav-link">Add Course</a></li>
+            <li><a href="{% url "dashboard" %}" class="nav-link">Dashboard</a></li>
+            <li><a href="{% url "addcourse" %}" class="nav-link">Add Course</a></li>
             <li><a href="#" class="nav-link">Contact</a></li>
             {% if user.is_authenticated %}
             <li class="profile-img">
