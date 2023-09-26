@@ -1,3 +1,4 @@
+from typing import Any
 from django import forms
 
 from .models import Course,cousreCategory,Chapter,Test
@@ -13,6 +14,16 @@ class CourseForm(forms.ModelForm):
     courseDescrip = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter Your Course Description'}),required=False)
     category = forms.ChoiceField(required=False,choices=cousreCategory,label='Select Category Of Cousre')
     courseImage = forms.ImageField(required=False,label='Course Image')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('courseTitle'):
+            raise forms.ValidationError('Course Name Cannot Be Empty')
+        if not cleaned_data.get('courseDescrip'):
+            raise forms.ValidationError('Course Description Cannot Be Empty')
+        if not cleaned_data.get('courseImage'):
+            raise forms.ValidationError('Image Field Cannot Be Empty')
+        return cleaned_data
 
 class ChapterForm(forms.ModelForm):
     course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))

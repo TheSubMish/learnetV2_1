@@ -79,6 +79,14 @@ nav {
     transform: translateY(-8px) rotate(-45deg);
 }
 
+#courseImage-clear_id {
+    display: none;
+}
+
+label[for="courseImage-clear_id"] {
+    display: none;
+}
+
 .nav-menu,
 .chap-menu {
     position: fixed;
@@ -269,15 +277,13 @@ textarea:focus {
 }
 
 .course-card .course-link {
-    display: flex;
-    justify-content: space-evenly;
-    margin: 25px 0;
+    margin: 35px 0;
 }
 
 .course-card a {
     border-radius: 10px;
-    padding: 10px 7px;
-    background-color: #b27fff;
+    padding: 10px 25px;
+    background-color: #147870;
     color: #f5fbfd;
     font-size: 20px;
 }
@@ -288,8 +294,16 @@ textarea:focus {
     font-size: 20px;
 }
 
-.course-card .course-link .delete {
+.course-nav {
+    width: fit-content;
+    display: flex;
+    justify-content: space-evenly;
+
+}
+
+.course-nav .delete {
     border-radius: 10px;
+    margin-left: 20px;
     padding: 10px 7px;
     background-color: #ff6161;
     color: #f5fbfd;

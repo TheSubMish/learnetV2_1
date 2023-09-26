@@ -1,19 +1,30 @@
-def course_validate(form_data):
+from .models import Course
+
+def course_validate(error_msg_dict):
     error = {
         'courseTitle': '',
         'courseDescrip': '',
+        'category': '',
         'courseImage': ''
     }
 
-    if form_data.get('courseTitle') == '':
-        error['courseTitle'] = 'Course Title Cannot Be Empty'
-    elif form_data.get('courseDescrip') == '':
-        error['courseDescrip'] = 'Course Description Cannot Be Empty'
-    elif form_data.get('courseImage') == '':
-        error['courseImage'] = 'Image Field Cannot Be Empty'
-    else:
-        return None
+    try:
+        if error_msg_dict['category']:
+            error['category'] = "Select Category Of Your Course"
+            return error
+    except KeyError:
+        pass
+
+    error_msg = error_msg_dict['__all__'][0]['message']
     
+    if 'Name' in error_msg:
+        error['courseTitle'] = error_msg
+    if 'Description' in error_msg:
+        error['courseDescrip'] = error_msg
+    if 'category' in error_msg:
+        error['category'] = error_msg
+    if 'Image' in error_msg:
+        error['courseImage'] = error_msg
     return error
 
 def chapter_validate(form_data):
@@ -34,7 +45,7 @@ def chapter_validate(form_data):
     
     return error
 
-def test_vlaidate(form_data):
+def test_validate(form_data):
     error = {
         'course': '',
         'title': '',

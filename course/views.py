@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.views.generic import CreateView
+from django.views.generic.edit import CreateView,UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.text import slugify
@@ -7,7 +7,7 @@ import json
 
 from .models import Course,Chapter,Test
 from .forms import CourseForm,ChapterForm,TestForm
-from .validations import course_validate,chapter_validate,test_vlaidate
+from .validations import course_validate,chapter_validate,test_validate
 from .create_get import create_test
 from teacher.models import Teacher 
 
@@ -28,26 +28,21 @@ class AddCourse(LoginRequiredMixin,CreateView):
     def post(self,request):
         course_data = self.form_class(request.POST,request.FILES)
         if course_data.is_valid():
-            if error_msg:= course_validate(course_data.cleaned_data):
-                return render(request,self.template_name,{'form':course_data,'error':error_msg})
-            else:
-                teacher = Teacher.objects.get(user=request.user)
-                Course.objects.create(teacher=teacher,**course_data.cleaned_data,slug=slugify(course_data.cleaned_data['courseTitle']))
-                url = reverse('addchapter', kwargs={'course_slug': slugify(course_data.cleaned_data['courseTitle'])})
-                return redirect(url)
-        else:
-            error_msg = json.loads(course_data.errors.as_json())
-            print(error_msg)
             try:
-                if error_msg['category']:
-                    error_msg['category'] = "Select Category Of Your Course"
-                    return render(request,self.template_name,{'form':course_data,'error':error_msg})
-            except KeyError:
+                if Course.objects.get(courseTitle = course_data.cleaned_data['courseTitle']):
+                    error = {'courseTitle':'Course With Name Already Exist'}
+                    return render(self.request,self.template_name,{'form':course_data,'error':error})
+            except Course.DoesNotExist:
                 pass
 
-            if error_msg['courseTitle']:
-                error_msg['courseTitle'] = "Course With This Name Already Exists"
-                return render(request,self.template_name,{'form':course_data,'error':error_msg})
+            teacher = Teacher.objects.get(user=request.user)
+            Course.objects.create(teacher=teacher,**course_data.cleaned_data,slug=slugify(course_data.cleaned_data['courseTitle']))
+            url = reverse('addchapter', kwargs={'course_slug': slugify(course_data.cleaned_data['courseTitle'])})
+            return redirect(url)
+        else:
+            error_msg_dict = json.loads(course_data.errors.as_json())
+            error = course_validate(error_msg_dict)
+            return render(request,self.template_name,{'form':course_data,'error':error})
             
 class AddChapter(LoginRequiredMixin,CreateView):
     login_url = '/login/'
@@ -105,7 +100,7 @@ class AddTest(AddChapter):
                 course.save()
                 return redirect('teacher_dashboard')
             
-            if error_msg:=test_vlaidate(test_data.cleaned_data):
+            if error_msg:=test_validate(test_data.cleaned_data):
                 print(error_msg)
                 return render(request,self.template_name,{'form':test_data,'error':error_msg})
             else:
@@ -115,3 +110,24 @@ class AddTest(AddChapter):
                     return redirect(url)
             
         return redirect('teacher_dashboard')
+    
+
+class UpdateCourse(LoginRequiredMixin,UpdateView):
+    login_url = '/login/'
+    template_name = 'updateCourse.html'
+    model = Course
+    form_class = CourseForm
+    success_url = '/dashboard'
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            Teacher.objects.get(user=request.user)
+        except:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        error_msg_dict = json.loads(form.errors.as_json())
+        error = course_validate(error_msg_dict)
+        return render(self.request,self.template_name,{'form':form,'error':error})
+    

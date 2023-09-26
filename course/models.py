@@ -16,11 +16,11 @@ cousreCategory = (
 
 class Course(models.Model):
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
-    courseTitle = models.CharField(max_length=100,unique=True)
+    courseTitle = models.CharField(max_length=100,null=False)
     slug = models.SlugField(max_length=100,null=True)
-    courseDescrip = models.TextField()
+    courseDescrip = models.TextField(null=False)
     category = models.CharField(max_length=30,choices=cousreCategory)
-    courseImage = models.ImageField(upload_to='courseImage')
+    courseImage = models.ImageField(upload_to='courseImage',null=False)
     published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

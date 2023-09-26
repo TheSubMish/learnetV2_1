@@ -7,6 +7,7 @@ import json
 from .models import Teacher
 from .forms import TeacherInformationForm
 from student.get_or_create import get_user_information,save_user_name,update_user_information
+from course.models import Course
 
 # Create your views here.
 
@@ -22,8 +23,14 @@ class TeacherDashboard(LoginRequiredMixin,FormView):
             currentuserinfo = Teacher.objects.get(user=request.user)
         except Teacher.DoesNotExist:
             return redirect(self.login_url)
+        
+        courses = Course.objects.filter(teacher=currentuserinfo).order_by('-id')[:4]
+        
         self.form_class = get_user_information(request.user,currentuserinfo)
-        return render(request,self.template_name,{'form':self.form_class,'error':error,'pic':currentuserinfo})
+        if courses.exists():
+            return render(request,self.template_name,{'form':self.form_class,'error':error,'pic':currentuserinfo,'courses':courses})
+        else:
+            return render(request,self.template_name,{'form':self.form_class,'error':error,'pic':currentuserinfo})
 
     def post(self,request,error=None):
         user_info_form_data = self.form_class(request.POST,request.FILES)
