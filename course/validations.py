@@ -27,22 +27,19 @@ def course_validate(error_msg_dict):
         error['courseImage'] = error_msg
     return error
 
-def chapter_validate(form_data):
+def chapter_validate(error_msg_dict):
     error = {
         'course': '',
         'chapterName': '',
         'chapterBody': ''
     }
-
-    if form_data.get('course') == '':
-        error['course'] = 'Course Name Cannot Be Empty'
-    elif form_data.get('chapterName') == '':
-        error['chapterName'] = 'Chapter Name Cannot Be Empty'
-    elif form_data.get('chapterBody') == '':
-        error['chapterBody'] = 'Chapter Content Cannot Be Empty'
-    else:
-        return None
-    
+    error_msg = error_msg_dict['__all__'][0]['message']
+    if 'Course' in error_msg:
+        error['course'] = error_msg
+    if 'Name' in error_msg:
+        error['chapterName'] = error_msg
+    if 'Content' in error_msg:
+        error['chapterBody'] = error_msg
     return error
 
 def test_validate(form_data):

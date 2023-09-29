@@ -26,17 +26,28 @@ class CourseForm(forms.ModelForm):
         return cleaned_data
 
 class ChapterForm(forms.ModelForm):
-    course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
 
     class Meta:
         model = Chapter
         fields = '__all__'
-        exclude = ['course']
+        # exclude = ['course']
 
+    # course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
     chapterName = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Chapter Name'}))
     chapterBody = forms.CharField(required=False,widget=forms.Textarea(attrs={'placeholder':'Enter Chapter Content'}))
     add_more = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
     next = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('course'):
+            raise forms.ValidationError('Course Name Cannot Be Empty')
+        if not cleaned_data.get('chapterName'):
+            raise forms.ValidationError('Chapter Name Cannot Be Empty')
+        if not cleaned_data.get('chapterBody'):
+            raise forms.ValidationError('Chapter Content Cannot Be Empty')
+        return cleaned_data
+    
 
 class TestForm(forms.ModelForm):
     course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
