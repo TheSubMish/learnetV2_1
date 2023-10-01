@@ -303,7 +303,7 @@ textarea:focus {
 
 .course-nav .delete {
     border-radius: 10px;
-    margin-left: 20px;
+    margin: 0 20px;
     padding: 10px 7px;
     background-color: #ff6161;
     color: #f5fbfd;
@@ -348,10 +348,12 @@ textarea:focus {
     margin-bottom: 15px;
 }
 
-.glass-card a {
+.glass-card .glass-card-links div form .glass-delete{
     color: #f5fbfd;
     background-color: #ff6161;
-    padding: 10px;
+    padding: 13px;
+    font-size: 15px;
+    border: 0;
     border-radius: 5px;
     margin-bottom: 15px;
 }
