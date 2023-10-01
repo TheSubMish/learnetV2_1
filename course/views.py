@@ -10,6 +10,7 @@ from .forms import CourseForm, ChapterForm, TestForm
 from .validations import course_validate, chapter_validate, test_validate
 from .create_get import create_test
 from teacher.models import Teacher
+from .next_object import get_next_chapter,get_next_test
 
 # Create your views here.
 class AddCourse(LoginRequiredMixin, CreateView):
@@ -18,33 +19,33 @@ class AddCourse(LoginRequiredMixin, CreateView):
     model = Course
     form_class = CourseForm
 
-    def get(self, request):
+    def dispatch(self, request, *args, **kwargs):
         try:
             Teacher.objects.get(user=request.user)
-            return render(request, self.template_name, {'form': self.form_class})
-        except Teacher.DoesNotExist:
-            return redirect(self.login_url)
+        except:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request):
-        course_data = self.form_class(request.POST, request.FILES)
-        if course_data.is_valid():
-            try:
-                if Course.objects.get(courseTitle=course_data.cleaned_data['courseTitle']):
-                    error = {'courseTitle': 'Course With Name Already Exist'}
-                    return render(self.request, self.template_name, {'form': course_data, 'error': error})
-            except Course.DoesNotExist:
-                pass
+    def form_invalid(self, form):
+        error_msg_dict = json.loads(form.errors.as_json())
+        error = course_validate(error_msg_dict)
+        return render(self.request, self.template_name, {'form': form, 'error': error})
+    
+    def form_valid(self, form):
+        teacher = Teacher.objects.get(user=self.request.user)
+        form.instance.teacher = teacher
+        course_title = form.cleaned_data['courseTitle']
+        
+        if Course.objects.filter(courseTitle=course_title).exists():
+            form.add_error('courseTitle', 'Course With This Name Already Exists')
+            return self.form_invalid(form)
+        
+        response = super().form_valid(form)
+        return response
 
-            teacher = Teacher.objects.get(user=request.user)
-            Course.objects.create(teacher=teacher, **course_data.cleaned_data,
-                                  slug=slugify(course_data.cleaned_data['courseTitle']))
-            url = reverse('addchapter', kwargs={'course_slug': slugify(
-                course_data.cleaned_data['courseTitle'])})
-            return redirect(url)
-        else:
-            error_msg_dict = json.loads(course_data.errors.as_json())
-            error = course_validate(error_msg_dict)
-            return render(request, self.template_name, {'form': course_data, 'error': error})
+    def get_success_url(self):
+        form = self.request.POST
+        return reverse('addchapter', kwargs={'slug': slugify(form.get('courseTitle'))})
 
 
 class AddChapter(LoginRequiredMixin, CreateView):
@@ -53,38 +54,32 @@ class AddChapter(LoginRequiredMixin, CreateView):
     model = Chapter
     form_class = ChapterForm
 
-    def get(self, request, course_slug=None):
+    def dispatch(self, request, *args, **kwargs):
         try:
             Teacher.objects.get(user=request.user)
-        except Teacher.DoesNotExist:
-            return redirect(self.login_url)
+        except:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_initial(self):
+        initial = super(AddChapter, self).get_initial()
+        initial['course'] = Course.objects.get(slug=self.kwargs['slug'])
+        return initial
 
-        course = Course.objects.get(slug=course_slug)
-        self.form_class = self.form_class(initial={'course': course})
-        return render(request, self.template_name, {'form': self.form_class})
-
-    def post(self, request, course_slug=None):
-        chapter_data = self.form_class(request.POST)
-        if chapter_data.is_valid():
-            course = Course.objects.get(slug=course_slug)
-            Chapter.objects.create(
-                course=course,
-                chapterName=chapter_data.cleaned_data['chapterName'],
-                chapterBody=chapter_data.cleaned_data['chapterBody']
-            )
-            if chapter_data.cleaned_data['add_more']:
-                url = reverse('addchapter', kwargs={'course_slug': slugify(
-                    chapter_data.cleaned_data['course'])})
-                return redirect(url)
-            else:
-                url = reverse('addtest', kwargs={'course_slug': slugify(
-                    chapter_data.cleaned_data['course'])})
-                return redirect(url)
-        else:
-            error_msg_dict = json.loads(chapter_data.errors.as_json())
-            print(error_msg_dict)
-            error = chapter_validate(error_msg_dict)
-            return render(request, self.template_name, {'form': chapter_data, 'error': error})
+    def form_invalid(self, form):
+        error_msg_dict = json.loads(form.errors.as_json())
+        error = chapter_validate(error_msg_dict)
+        return render(self.request, self.template_name, {'form': form, 'error': error})
+    
+    def get_success_url(self):
+        form = self.request.POST
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        # next takes to add test
+        if form.get('next'):
+            return reverse_lazy('addtest', kwargs={'slug': course.slug})
+        # add_more takes to add another chapter
+        if form.get('add_more'):
+            return reverse('addchapter', kwargs={'slug': course.slug})
 
 
 class AddTest(AddChapter):
@@ -93,30 +88,34 @@ class AddTest(AddChapter):
     model = Test
     form_class = TestForm
 
-    def get(self, request, course_slug=None):
-        response = super().get(request, course_slug)
-        return response
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            Teacher.objects.get(user=request.user)
+        except:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_initial(self):
+        initial = super(AddChapter, self).get_initial()
+        initial['course'] = Course.objects.get(slug=self.kwargs['slug'])
+        return initial
 
-    def post(self, request, course_slug=None):
-        test_data = self.form_class(request.POST)
-        if test_data.is_valid():
-            if test_data.cleaned_data['publish']:
-                course = Course.objects.get(slug=course_slug)
-                course.published = True
-                course.save()
-                return redirect('teacher_dashboard')
-
-            if error_msg := test_validate(test_data.cleaned_data):
-                print(error_msg)
-                return render(request, self.template_name, {'form': test_data, 'error': error_msg})
-            else:
-                create_test(test_data.cleaned_data, course_slug)
-                if test_data.cleaned_data['add_more']:
-                    url = reverse('addtest', kwargs={'course_slug': slugify(
-                        test_data.cleaned_data['course'])})
-                    return redirect(url)
-
-        return redirect('teacher_dashboard')
+    def form_invalid(self, form):
+        error_msg_dict = json.loads(form.errors.as_json())
+        error = test_validate(error_msg_dict)
+        return render(self.request, self.template_name, {'form': form, 'error': error})
+    
+    def get_success_url(self):
+        form = self.request.POST
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        # next takes to add test
+        if form.get('publish'):
+            course.published = True
+            course.save()
+            return '/teacher/dashboard/'
+        # add_more takes to add another chapter
+        if form.get('add_more'):
+            return reverse('addtest', kwargs={'slug': course.slug})
 
 
 class UpdateCourse(LoginRequiredMixin, UpdateView):
@@ -131,7 +130,7 @@ class UpdateCourse(LoginRequiredMixin, UpdateView):
         try:
             pk = Chapter.objects.filter(course=course).first().pk
         except AttributeError:
-            return reverse_lazy('addchapter', kwargs={'course_slug': slug})
+            return reverse_lazy('addchapter', kwargs={'slug': slug})
         return reverse_lazy('updatechapter', kwargs={'slug': slug, 'pk': pk})
 
     def dispatch(self, request, *args, **kwargs):
@@ -159,8 +158,66 @@ class UpdateChapter(LoginRequiredMixin,UpdateView):
         except:
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = Teacher.objects.get(user=self.request.user)
+        context['course'] = Course.objects.filter(teacher=teacher)
+        return context
 
     def form_invalid(self, form):
         error_msg_dict = json.loads(form.errors.as_json())
         error = chapter_validate(error_msg_dict)
         return render(self.request, self.template_name, {'form': form, 'error': error})
+    
+    def get_success_url(self):
+        form = self.request.POST
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        # next takes to another chapter
+        if form.get('next'):
+            next_chapter = get_next_chapter(course,self.kwargs['pk'])
+            if not next_chapter:
+                return reverse('addchapter', kwargs={'course_slug': course.slug})
+            else:
+                return reverse('updatechapter', kwargs={'slug': course.slug, 'pk': next_chapter.pk})
+        # add_more takes to update test or add test
+        if form.get('add_more'):
+            try:
+                pk = Test.objects.filter(course=course).first().pk
+            except AttributeError:
+                return reverse_lazy('addtest', kwargs={'course_slug': course.slug})
+            
+            return reverse_lazy('updatetest', kwargs={'slug': course.slug, 'pk': pk})
+    
+class UpdateTest(LoginRequiredMixin,UpdateView):
+    login_url = '/login/'
+    template_name = 'updateTest.html'
+    form_class = TestForm
+    model = Test
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            Teacher.objects.get(user=request.user)
+        except:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        error_msg_dict = json.loads(form.errors.as_json())
+        error = test_validate(error_msg_dict)
+        return render(self.request, self.template_name, {'form': form, 'error': error})
+    
+    def get_success_url(self):
+        form = self.request.POST
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        # add_more takes to another test
+        if form.get('add_more'):
+            next_test = get_next_test(course,self.kwargs['pk'])
+            if not next_test:
+                url = reverse('addtest', kwargs={'course_slug': course.slug})
+                return redirect(url)
+            else:
+                return reverse('updatetest', kwargs={'slug': course.slug, 'pk': next_test.pk})
+        # publish takes to dashboard
+        if form.get('publish'):
+            return '/teacher_dashboard/'

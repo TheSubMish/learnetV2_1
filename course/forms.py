@@ -1,4 +1,3 @@
-from typing import Any
 from django import forms
 
 from .models import Course,cousreCategory,Chapter,Test
@@ -30,9 +29,7 @@ class ChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
         fields = '__all__'
-        # exclude = ['course']
-
-    # course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
+        
     chapterName = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Chapter Name'}))
     chapterBody = forms.CharField(required=False,widget=forms.Textarea(attrs={'placeholder':'Enter Chapter Content'}))
     add_more = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
@@ -50,12 +47,11 @@ class ChapterForm(forms.ModelForm):
     
 
 class TestForm(forms.ModelForm):
-    course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
+    # course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
 
     class Meta:
         model = Test
         fields = '__all__'
-        exclude = ['course']
 
     title = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Test Title'}))
     question = forms.CharField(max_length=200,required=False,widget=forms.TextInput(attrs={'placeholder':'Test Question'}))
@@ -66,3 +62,23 @@ class TestForm(forms.ModelForm):
     corAns = forms.CharField(max_length=100,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Correct Answer'}))
     add_more = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
     publish = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('course'):
+            raise forms.ValidationError('Course Name Cannot Be Empty')
+        if not cleaned_data.get('title'):
+            raise forms.ValidationError('Test Title Field Cannot Be Empty')
+        if not cleaned_data.get('question'):
+            raise forms.ValidationError('Question Field Cannot Be Empty')
+        if not cleaned_data.get('option1'):
+            raise forms.ValidationError('Option One Field Cannot Be Empty')
+        if not cleaned_data.get('option2'):
+            raise forms.ValidationError('Option Two Field Cannot Be Empty')
+        if not cleaned_data.get('option3'):
+            raise forms.ValidationError('Option Three Field Cannot Be Empty')
+        if not cleaned_data.get('option4'):
+            raise forms.ValidationError('Option Four Field Cannot Be Empty')
+        if not cleaned_data.get('corAns'):
+            raise forms.ValidationError('Correct Answer Field Cannot Be Empty')
+        return cleaned_data

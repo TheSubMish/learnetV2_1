@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.text import slugify
+
 from teacher.models import Teacher
 
 # Create your models here.
@@ -24,6 +26,10 @@ class Course(models.Model):
     published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.courseTitle)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.courseTitle

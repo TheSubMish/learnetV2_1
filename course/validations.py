@@ -14,6 +14,13 @@ def course_validate(error_msg_dict):
             return error
     except KeyError:
         pass
+    
+    try:
+        if error_msg_dict['courseTitle']:
+            error['courseTitle'] = "Course With This Name Already Exists"
+            return error
+    except KeyError:
+        pass
 
     error_msg = error_msg_dict['__all__'][0]['message']
     
@@ -42,7 +49,7 @@ def chapter_validate(error_msg_dict):
         error['chapterBody'] = error_msg
     return error
 
-def test_validate(form_data):
+def test_validate(error_msg_dict):
     error = {
         'course': '',
         'title': '',
@@ -54,23 +61,21 @@ def test_validate(form_data):
         'corAns': ''
     }
 
-    if form_data.get('course') == '':
-        error['course'] = 'Course Name Cannot Be Empty'
-    elif form_data.get('title') == '':
-        error['title'] = 'Test Title Cannot Be Empty'
-    elif form_data.get('question') == '':
-        error['question'] = 'Question Field Cannot Be Empty'
-    elif form_data.get('option1') == '':
-        error['option1'] = 'Option One Field Cannot Be Empty'
-    elif form_data.get('option2') == '':
-        error['option2'] = 'Option Two Field Cannot Be Empty'
-    elif form_data.get('option3') == '':
-        error['option3'] = 'Option Three Field Cannot Be Empty'
-    elif form_data.get('option4') == '':
-        error['option4'] = 'Option Four Field Cannot Be Empty'
-    elif form_data.get('corAns') == '':
-        error['corAns'] = 'Correct Answer Field Cannot Be Empty'
-    else:
-        return None
-    
+    error_msg = error_msg_dict['__all__'][0]['message']
+    if 'Course' in error_msg:
+        error['course'] = error_msg
+    if 'Title' in error_msg:
+        error['title'] = error_msg
+    if 'Question' in error_msg:
+        error['question'] = error_msg
+    if 'One' in error_msg:
+        error['option1'] = error_msg
+    if 'Two' in error_msg:
+        error['option2'] = error_msg
+    if 'Three' in error_msg:
+        error['option3'] = error_msg
+    if 'Four' in error_msg:
+        error['option4'] = error_msg
+    if 'Answer' in error_msg:
+        error['corAns'] = error_msg
     return error
