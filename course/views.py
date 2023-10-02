@@ -158,6 +158,13 @@ class UpdateChapter(LoginRequiredMixin,UpdateView):
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = Teacher.objects.get(user=self.request.user)
+        courses = Course.objects.filter(teacher=user)
+        kwargs['teacher_courses'] = courses
+        return kwargs
+    
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
         context['course'] = Course.objects.get(slug=self.kwargs['slug'])

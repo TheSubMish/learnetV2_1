@@ -1,6 +1,6 @@
 {% extends 'teachcourseBase.html' %}
 {% block title %}
-  Add Chapter - Learnet
+  Update Chapter - Learnet
 {% endblock %}
 {% block content %}
   <div class="grid">
@@ -10,7 +10,7 @@
           {% csrf_token %}
           <div class="chapter">
             <div class="chapter-head">
-              <h1>Add Chapter</h1>
+              <h1>Update Chapter</h1>
             </div>
             <div class="chapter-body">
               {{ form.course }}

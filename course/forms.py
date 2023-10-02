@@ -45,6 +45,13 @@ class ChapterForm(forms.ModelForm):
             raise forms.ValidationError('Chapter Content Cannot Be Empty')
         return cleaned_data
     
+    def __init__(self, *args, **kwargs):
+        teacher_courses = kwargs.pop('teacher_courses', None)
+        super().__init__(*args, **kwargs)
+
+        if teacher_courses:
+            self.fields['course'].queryset = teacher_courses
+    
 
 class TestForm(forms.ModelForm):
     # course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
