@@ -54,7 +54,6 @@ class ChapterForm(forms.ModelForm):
     
 
 class TestForm(forms.ModelForm):
-    # course = forms.CharField(max_length=50,required=False,widget=forms.TextInput(attrs={'placeholder':'Enter Course Name'}))
 
     class Meta:
         model = Test
@@ -89,3 +88,10 @@ class TestForm(forms.ModelForm):
         if not cleaned_data.get('corAns'):
             raise forms.ValidationError('Correct Answer Field Cannot Be Empty')
         return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        teacher_courses = kwargs.pop('teacher_courses', None)
+        super().__init__(*args, **kwargs)
+
+        if teacher_courses:
+            self.fields['course'].queryset = teacher_courses

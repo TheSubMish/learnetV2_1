@@ -60,6 +60,13 @@ class AddChapter(LoginRequiredMixin, CreateView):
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = Teacher.objects.get(user=self.request.user)
+        courses = Course.objects.filter(teacher=user)
+        kwargs['teacher_courses'] = courses
+        return kwargs
+    
     def get_initial(self):
         initial = super(AddChapter, self).get_initial()
         initial['course'] = Course.objects.get(slug=self.kwargs['slug'])
@@ -99,6 +106,13 @@ class AddTest(AddChapter):
         initial['course'] = Course.objects.get(slug=self.kwargs['slug'])
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = Teacher.objects.get(user=self.request.user)
+        courses = Course.objects.filter(teacher=user)
+        kwargs['teacher_courses'] = courses
+        return kwargs
+    
     def form_invalid(self, form):
         error_msg_dict = json.loads(form.errors.as_json())
         error = test_validate(error_msg_dict)
@@ -208,6 +222,13 @@ class UpdateTest(LoginRequiredMixin,UpdateView):
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = Teacher.objects.get(user=self.request.user)
+        courses = Course.objects.filter(teacher=user)
+        kwargs['teacher_courses'] = courses
+        return kwargs
+    
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
         context['course'] = Course.objects.get(slug=self.kwargs['slug'])
@@ -231,7 +252,7 @@ class UpdateTest(LoginRequiredMixin,UpdateView):
                 return reverse('updatetest', kwargs={'slug': course.slug, 'pk': next_test.pk})
         # publish takes to dashboard
         if form.get('publish'):
-            return '/teacher_dashboard/'
+            return '/teacher/dashboard/'
         
 
 class DeleteCourse(DeleteView):

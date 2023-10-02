@@ -15,7 +15,7 @@ def get_next_chapter(course, current_chapter_id):
     return None
 
 def get_next_test(course, current_test_id):
-    tests = Chapter.objects.filter(course=course).order_by('id')
+    tests = Test.objects.filter(course=course).order_by('id')
     
     current_test_index = next((
         index for index, 
