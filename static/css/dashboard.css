@@ -58,10 +58,6 @@ h2 {
     cursor: pointer;
 }
 
-.personal-details-content .personal-body div .change-pass a {
-    color: white;
-}
-
 .personal-details .user-edu select {
     padding: 10px 20px;
     margin: 10px 0;
