@@ -1,136 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-  {% load static %}
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="{% static '/css/style.css' %}" />
-    <link rel="stylesheet" href="{% static '/css/dashboard.css' %}" />
-    <link rel="shortcut icon" href="{% static '/img/favicon.png' %}" type="image/png" />
-    <title>Many Course - Learnet</title>
-  </head>
-  <nav>
-    <div class="nav-title">
-      <a href="{% url 'home' %}">Learnet</a>
-    </div>
-    <div class="nav-links">
-      <ul class="nav-menu">
-        <li>
-          <a href="{% url 'home' %}" class="nav-link">Home</a>
-        </li>
-        <li>
-          <a href="{% url 'many_course' %}" class="nav-link">Courses</a>
-        </li>
-        <li>
-          <a href="" class="nav-link">Contact</a>
-        </li>
-        {% if user.is_authenticated %}
-          <li class="profile-img">
-            <img src="{% static 'img/profile.jpg' %}" alt="Profile Image" />
-            <ul class="profile-links">
-              <li>
-                <a href="{% url 'student_dashboard' %}">Dashboard</a>
-              </li>
-              <li class="login">
-                <a href="{% url 'logout' %}">Log-Out</a>
-              </li>
-            </ul>
-          </li>
-        {% else %}
-          <li class="login">
-            <a href="{% url 'login' %}" class="nav-link">Log-In</a>
-          </li>
-        {% endif %}
-      </ul>
-      <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-    </div>
-  </nav>
-
-  <body>
-    <div class="container">
-      <div class="many-course-container">
-        <div class="many-course-contains">
-          {% if courses %}
-            {% for course in courses %}
-              <div class="many-course">
-                <div class="many-course-img">
-                  <img src="{{ course.courseImage.url }}" alt="{{ course.courseTitle }}" />
-                </div>
-                <div class="many-course-body">
-                  <div>
-                    <h1>{{ course.courseTitle }}</h1>
-                    {% if course.courseDescrip|length > 100 %}
-                      <p class="course-descrip">{{ course.courseDescrip|slice:':100' }}...</p>
-                    {% else %}
-                      <p class="course-descrip">{{ course.courseDescrip }}</p>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="many-course-enroll">
-                  <a href="/course/{{course.slug}}" class="enroll">Enroll</a>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  All Courses - Learnet
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="many-course-container">
+      <div class="many-course-contains">
+        {% if courses %}
+          {% for course in courses %}
+            <div class="many-course">
+              <div class="many-course-img">
+                <img src="{{ course.courseImage.url }}" alt="{{ course.courseTitle }}" />
+              </div>
+              <div class="many-course-body">
+                <div>
+                  <h1>{{ course.courseTitle }}</h1>
+                  {% if course.courseDescrip|length > 100 %}
+                    <p class="course-descrip">{{ course.courseDescrip|slice:':100' }}...</p>
+                  {% else %}
+                    <p class="course-descrip">{{ course.courseDescrip }}</p>
+                  {% endif %}
                 </div>
               </div>
-            {% endfor %}
-          {% endif %}
-        </div>
+              <div class="many-course-enroll">
+                <a href="/course/{{ course.slug }}" class="enroll">Enroll</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
-  </body>
-  <footer>
-    <div class="img">
-      <img src="{% static '/img/logo.png' %}" alt="Learnet Company Logo" />
-    </div>
-    <div class="foot">
-      <div class="footer-title">
-        <h3>Social link:</h3>
-      </div>
-      <div>
-        <div>
-          <img src="{% static '/img/fb.png' %}" alt="Nepal Padhcha Facebook" />
-          <a href="#">Facebook</a>
-        </div>
-        <div>
-          <img src="{% static '/img/yt.png' %}" alt="Nepal Padhcha YouTube" />
-          <a href="#">YouTube</a>
-        </div>
-        <div>
-          <img src="{% static '/img/twitter.png' %}" alt="Nepal Padhcha Twitter" />
-          <a href="#">Twitter</a>
-        </div>
-        <div>
-          <img src="{% static '/img/email.png' %}" alt="Nepal Padhcha Twitter" />
-          <a href="#">E-mail</a>
-        </div>
-      </div>
-    </div>
-    <div class="foot">
-      <div class="footer-title">
-        <h3>Courses:</h3>
-      </div>
-      <div>
-        <div>
-          <img src="{% static '/img/book1.png' %}" alt="Nepal Padhcha Facebook" />
-          <a href="singleCourse.html">Course</a>
-        </div>
-        <div>
-          <img src="{% static '/img/book2.png' %}" alt="Nepal Padhcha YouTube" />
-          <a href="singleCourse.html">Course</a>
-        </div>
-        <div>
-          <img src="{% static '/img/book3.png' %}" alt="Nepal Padhcha Twitter" />
-          <a href="singleCourse.html">Course</a>
-        </div>
-        <div>
-          <img src="{% static '/img/book4.png' %}" alt="Nepal Padhcha Twitter" />
-          <a href="singleCourse.html">Course</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <script src="{% static '/js/script.js' %}"></script>
-</html>
+  </div>
+{% endblock %}

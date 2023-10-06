@@ -1,14 +1,16 @@
 from django.shortcuts import render,redirect
-from django.views.generic import CreateView,ListView
+from django.views.generic import CreateView,ListView,FormView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max
 import json
+from django.core.mail import send_mail
 
 from .forms import UserInformationForm,UserPreferenceForm
 from .models import Student,UserPreference,Enroll,StudentMark
 from userlog.models import CustomUser
+from userlog.forms import ContactForm
 from course.models import Course,Chapter,Test
 from .get_or_create import get_user_information,get_user_preferences,save_user_name,update_user_information,create_pref,update_pref
 
@@ -78,6 +80,7 @@ class SingleCourse(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course = Course.objects.get(slug=self.kwargs['slug'])
+        context['course'] = course
         context['chapter'] = Chapter.objects.filter(course=course).first()
         return context
 
@@ -154,3 +157,27 @@ class GiveTest(LoginRequiredMixin,DetailView):
             StudentMark.objects.create(test=test,student=student,score=score)
         url = reverse_lazy('give_test', kwargs={'slug':slug,'pk':pk,'title':title})
         return redirect(url)
+    
+class StudentContact(FormView):
+    template_name = 'contact.html'
+    form_class = ContactForm
+
+    def form_invalid(self, form):
+        error = {'username':'','email':'','message':''}
+        error_msg_dict = json.loads(form.errors.as_json())
+        error_msg = error_msg_dict['__all__'][0]['message']
+        if 'Username' in error_msg:
+            error['username'] = error_msg
+        if 'E-mail' in error_msg:
+            error['email'] = error_msg
+        if 'Message' in error_msg:
+            error['message'] = error_msg
+        return render(self.request,self.template_name,{'form':form,'error':error})
+    
+    def form_valid(self,form):
+        from_email = self.request.POST['email']
+        subject = "Message from " + from_email
+        message = self.request.POST['message']
+        recipient_email = 'sumi_csit2077@lict.edu.np'
+        send_mail(subject,message,from_email,[recipient_email])
+        return redirect('student_contact')

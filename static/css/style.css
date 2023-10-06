@@ -75,9 +75,9 @@ textarea:focus {
     border: 3px solid black;
 }
 
-label {
+/* label {
     text-transform: capitalize;
-}
+} */
 
 .sub-btn {
     padding: 10px;
@@ -88,9 +88,9 @@ label {
     transition: 0.7s ease;
 }
 
-/* .error {
-    background-color: #ffa0a0;
-} */
+.error {
+    color: #ffa0a0;
+}
 
 .nav-title a {
     font-size: 30px;
@@ -891,7 +891,7 @@ footer span {
     }
 
     .contact-page div {
-        margin: 20px 0;
+        margin: 10px 0;
     }
 
     .contact-page div h1 {

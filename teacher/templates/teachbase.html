@@ -22,7 +22,7 @@
           <a href="{% url 'addcourse' %}" class="nav-link">Add Course</a>
         </li>
         <li>
-          <a href="#" class="nav-link">Contact</a>
+          <a href="{% url "teacher_contact" %}" class="nav-link">Contact</a>
         </li>
         {% if user.is_authenticated %}
           <li class="profile-img">

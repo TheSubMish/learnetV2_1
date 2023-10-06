@@ -3,12 +3,14 @@ from django.views.generic import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 import json
+from django.core.mail import send_mail
 
 from .models import Teacher
 from .forms import TeacherInformationForm
 from student.get_or_create import get_user_information,save_user_name,update_user_information
 from course.models import Course
-
+from student.views import StudentContact
+from userlog.forms import ContactForm
 # Create your views here.
 
 class TeacherDashboard(LoginRequiredMixin,FormView):
@@ -48,3 +50,27 @@ class TeacherDashboard(LoginRequiredMixin,FormView):
             else:
                 error_msg = error_msg_dict['__all__'][0]['message']
             return redirect('teacher_dashboard_error',error_msg)
+        
+class TeacherContact(StudentContact):
+    template_name = 'teach_contact.html'
+    form_class = ContactForm
+
+    def form_invalid(self, form):
+        error = {'username':'','email':'','message':''}
+        error_msg_dict = json.loads(form.errors.as_json())
+        error_msg = error_msg_dict['__all__'][0]['message']
+        if 'Username' in error_msg:
+            error['username'] = error_msg
+        if 'E-mail' in error_msg:
+            error['email'] = error_msg
+        if 'Message' in error_msg:
+            error['message'] = error_msg
+        return render(self.request,self.template_name,{'form':form,'error':error})
+    
+    def form_valid(self,form):
+        from_email = self.request.POST['email']
+        subject = "Message from " + from_email
+        message = self.request.POST['message']
+        recipient_email = 'sumi_csit2077@lict.edu.np'
+        send_mail(subject,message,from_email,[recipient_email])
+        return redirect('student_contact')

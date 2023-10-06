@@ -34,3 +34,19 @@ class LogInForm(forms.Form):
         if not user:
             raise forms.ValidationError('Authentication Failed, Incorrect Username or Password')
         return cleaned_data
+    
+class ContactForm(forms.Form):
+    username = forms.CharField(max_length=30,widget=forms.TextInput(attrs={'placeholder':'Username'}),required=False)
+    email = forms.EmailField(max_length=30,widget=forms.EmailInput(attrs={'placeholder': 'Enter Your E-Mail'}), required=False)
+    message = forms.CharField(widget=forms.Textarea(attrs={'placeholder':'Enter Your Message'}),required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        if not cleaned_data.get('username'):
+            raise forms.ValidationError('Username field is required')
+        if not cleaned_data.get('email'):
+            raise forms.ValidationError('E-mail field is required')
+        if not cleaned_data.get('message'):
+            raise forms.ValidationError('Message you want to convey?')
+        return cleaned_data
