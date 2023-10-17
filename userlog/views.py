@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.views import View
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView,RedirectView
 from django.views.generic.edit import CreateView,FormView
 from django.urls import reverse_lazy
@@ -13,11 +14,17 @@ from .forms import CustomUserForm,LogInForm
 from .models import CustomUser,MailToken
 from .validation import signValidate,emailPasswordValidate
 from .mail import send_forgot_password_mail
+from course.models import Course,Chapter
 from student.models import Student
 from teacher.models import Teacher
 
-class IndexPage(TemplateView):
+class IndexPage(ListView):
     template_name = 'index.html'
+    model = Course
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        return Course.objects.all()[:4]
 
 class SignUpPage(CreateView):
     template_name = 'signup.html'

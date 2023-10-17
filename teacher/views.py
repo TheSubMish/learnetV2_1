@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.views.generic import FormView
+from django.views.generic import FormView,ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 import json
@@ -51,7 +51,8 @@ class TeacherDashboard(LoginRequiredMixin,FormView):
                 error_msg = error_msg_dict['__all__'][0]['message']
             return redirect('teacher_dashboard_error',error_msg)
         
-class TeacherContact(StudentContact):
+class TeacherContact(LoginRequiredMixin,StudentContact):
+    login_url = '/login/'
     template_name = 'teach_contact.html'
     form_class = ContactForm
 
@@ -74,3 +75,13 @@ class TeacherContact(StudentContact):
         recipient_email = 'sumi_csit2077@lict.edu.np'
         send_mail(subject,message,from_email,[recipient_email])
         return redirect('student_contact')
+    
+class TeacherManyCourse(LoginRequiredMixin,ListView):
+    login_url = '/login/'
+    template_name = 'teachmanycourse.html'
+    model = Course
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        teacher = Teacher.objects.get(user=self.request.user)
+        return Course.objects.filter(teacher=teacher)

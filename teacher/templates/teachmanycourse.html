@@ -1,0 +1,35 @@
+{% extends 'teachbase.html' %}
+{% load static %}
+{% block title %}
+  All Courses - Learnet
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="many-course-container">
+      <div class="many-course-contains">
+        {% if courses %}
+          {% for course in courses %}
+            <div class="many-course">
+              <div class="many-course-img">
+                <img src="{{ course.courseImage.url }}" alt="{{ course.courseTitle }}" />
+              </div>
+              <div class="many-course-body">
+                <div>
+                  <h1>{{ course.courseTitle }}</h1>
+                  {% if course.courseDescrip|length > 100 %}
+                    <p class="course-descrip">{{ course.courseDescrip|slice:':100' }}...</p>
+                  {% else %}
+                    <p class="course-descrip">{{ course.courseDescrip }}</p>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="many-course-enroll">
+                <a href="{% url "updatecourse" course.slug %}" class="enroll">Edit</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

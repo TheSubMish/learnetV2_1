@@ -9,57 +9,35 @@
                 <div>
                     <h1>Your Courses</h1>
                 </div>
-                {% if cousre is None %}
+            {% if enrolls is None %}
                 <div class="no-course">
-                    <h2>You have not enrolled in any courses <a href="#" class="enroll">Click here </a>to enroll
-                    </h2>
+                    <h2>You are not enrolled in any courses <a href="{% url "many_course" %}" class="enroll">Click here </a>to enroll</h2>
                 </div>
-                {% else %}
+            {% else %}
             </div>
-            <div class="courses">
-                <div class="course">
-                    <div>
-                        <img src="{% static '/img/computer.png' %}" alt="Computer course">
+            <div class="course-container">
+                {% for enroll in enrolls  %}
+                    <div class="course-card">
+                        <div>
+                            <img src="{{ enroll.course.courseImage.url }}" alt="{{enroll.course.courseImage.url}}">
+                        </div>
+                        <div>
+                            <h1>
+                                {% if enroll.course.courseTitle|length > 11 %}
+                                    {{ enroll.course.courseTitle|slice:":10" }}...
+                                {%else %}
+                                    {{ enroll.course.courseTitle }}
+                                {% endif %}
+                            </h1>
+                            <div class="course-link">
+                                <a href="{% url "enroll" enroll.course.slug %}" class="edit">Read</a>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1>Course <span>1</span></h1>
-                        <p>Lorem ipsum dolor sit, amet elit. Culpa, quas.</p>
-                        <a href="#" class="enroll">Read Course</a>
-                    </div>
-                </div>
-                <div class="course">
-                    <div>
-                        <img src="{% static '/img/computer.png' %}" alt="Computer course">
-                    </div>
-                    <div>
-                        <h1>Course <span>2</span></h1>
-                        <p>Lorem ipsum dolor sit, amet elit. Culpa, quas.</p>
-                        <a href="#" class="enroll">Read Course</a>
-                    </div>
-                </div>
-                <div class="course">
-                    <div>
-                        <img src="{% static '/img/computer.png' %}" alt="Computer course">
-                    </div>
-                    <div>
-                        <h1>Course <span>3</span></h1>
-                        <p>Lorem ipsum dolor sit, amet elit. Culpa, quas.</p>
-                        <a href="#" class="enroll">Read Course</a>
-                    </div>
-                </div>
-                <div class="course">
-                    <div>
-                        <img src="{% static '/img/computer.png' %}" alt="Computer course">
-                    </div>
-                    <div>
-                        <h1>Course <span>4</span></h1>
-                        <p>Lorem ipsum dolor sit, amet elit. Culpa, quas.</p>
-                        <a href="#" class="enroll">Read Course</a>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
             <div class="more-course">
-                <a href="#">View More</a>
+                <a href="{% url "student_many_course" %}">View More</a>
             </div>
             {% endif %}
         </div>

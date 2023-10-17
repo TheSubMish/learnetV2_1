@@ -2,5 +2,7 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "python.formatting.provider": "none"
+    "python.formatting.provider": "none",
+    "appService.defaultWebAppToDeploy": "/subscriptions/f8e00b3b-c1da-44ef-a582-c41f90692eed/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/learnet",
+    "appService.deploySubpath": "."
 }

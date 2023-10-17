@@ -29,16 +29,22 @@ class StudentDashboard(LoginRequiredMixin,CreateView):
             currentuserinfo = Student.objects.get(user=currentuser)
         except Student.DoesNotExist:
             return redirect(self.login_url)
-
+        context = {'userform':self.userform,'prefform': self.prefForm,'pic':currentuserinfo,'error':error}
+        
+        try:
+            enrolls = Enroll.objects.filter(student=currentuserinfo)
+            context['enrolls'] = enrolls
+        except Enroll.DoesNotExist:
+            pass
         # get current user informations from database main code is in get_or_create.py    
         self.userform = get_user_information(currentuser,currentuserinfo)
         # get current user preferences from database main code is in get_or_create.py
         userPref = get_user_preferences(request)
         if userPref is None:
-            return render(request,self.template_name,{'userform':self.userform,'prefform': self.prefForm,'pic':currentuserinfo,'error':error})
+            return render(request,self.template_name,context)
         else:
             self.prefForm = userPref
-            return render(request,self.template_name,{'userform':self.userform,'prefform': self.prefForm,'pic':currentuserinfo,'error':error})
+            return render(request,self.template_name,context)
         
     def post(self,request,error=None):
         user_info_form_data = self.userform(request.POST,request.FILES)
@@ -181,3 +187,13 @@ class StudentContact(FormView):
         recipient_email = 'sumi_csit2077@lict.edu.np'
         send_mail(subject,message,from_email,[recipient_email])
         return redirect('student_contact')
+    
+class StudentManyCourse(LoginRequiredMixin,ListView):
+    login_url = '/login/'
+    template_name = 'teachmanycourse.html'
+    model = Course
+    context_object_name = 'enrolls'
+
+    def get_queryset(self):
+        student = Student.objects.get(user=self.request.user)
+        return Enroll.objects.filter(student=student)
