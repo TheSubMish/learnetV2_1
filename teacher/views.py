@@ -79,6 +79,7 @@ class TeacherContact(LoginRequiredMixin,StudentContact):
 class TeacherManyCourse(LoginRequiredMixin,ListView):
     login_url = '/login/'
     template_name = 'teachmanycourse.html'
+    paginate_by = 5
     model = Course
     context_object_name = 'courses'
 

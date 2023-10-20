@@ -75,6 +75,7 @@ class StudentDashboard(LoginRequiredMixin,CreateView):
 
 class AllCourses(ListView):
     template_name = 'manycourse.html'
+    paginate_by = 10
     model = Course
     context_object_name = 'courses'
     
@@ -190,7 +191,8 @@ class StudentContact(FormView):
     
 class StudentManyCourse(LoginRequiredMixin,ListView):
     login_url = '/login/'
-    template_name = 'teachmanycourse.html'
+    template_name = 'stumanycourse.html'
+    paginate_by = 5
     model = Course
     context_object_name = 'enrolls'
 

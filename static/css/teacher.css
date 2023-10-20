@@ -436,6 +436,14 @@ textarea:focus {
     background-color: #147870;
 }
 
+.pagination {
+    text-align: center;
+}
+
+.pagination a {
+    color: #b27fff;
+}
+
 @media (min-width:425px) and (max-width: 550px) {
     nav {
         padding: 0 70px;

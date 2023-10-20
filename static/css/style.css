@@ -466,6 +466,14 @@ textarea:focus {
     -ms-user-select: none;
 }
 
+.pagination {
+    text-align: center;
+}
+
+.pagination a {
+    color: #b27fff;
+}
+
 footer {
     margin: 50px 0 0 0;
     padding: 30px 20px;
