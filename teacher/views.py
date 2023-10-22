@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from .models import Teacher
 from .forms import TeacherInformationForm
 from student.get_or_create import get_user_information,save_user_name,update_user_information
-from course.models import Course
+from course.models import Course,Chapter,Test
 from student.views import StudentContact
 from userlog.forms import ContactForm
 # Create your views here.
@@ -86,3 +86,20 @@ class TeacherManyCourse(LoginRequiredMixin,ListView):
     def get_queryset(self):
         teacher = Teacher.objects.get(user=self.request.user)
         return Course.objects.filter(teacher=teacher)
+    
+class ManyEditPage(LoginRequiredMixin,ListView):
+    login_url = '/login/'
+    template_name = 'edit.html'
+    model = Chapter
+    context_object_name = 'chapters'
+
+    def get_queryset(self):
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        return Chapter.objects.filter(course=course)
+    
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        course = Course.objects.get(slug=self.kwargs['slug'])
+        context['course'] = course
+        context['tests'] = Test.objects.filter(course=course).order_by('title')
+        return context
