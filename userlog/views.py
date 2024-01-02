@@ -36,7 +36,6 @@ class SignUpPage(CreateView):
         if form_data.is_valid():
             if error_msg:=signValidate(form_data.cleaned_data):
                 return render(request, self.template_name, {"form": form_data,'error': error_msg})
-            print(form_data.cleaned_data)
             user = form_data.save()
             login(request,user)
             role = form_data.cleaned_data['role']
@@ -127,6 +126,8 @@ class ChangePassword(View):
         if password != cpassword:
             return render(request,'change.html',{'error':'Password did not matched'})
         user = MailToken.objects.get(token=uuid)
+        deleteToken = MailToken.objects.get(token=user.token)
+        deleteToken.delete()
         changepassuser = CustomUser.objects.get(username=user.user)
         changepassuser.password = make_password(password)
         changepassuser.save()

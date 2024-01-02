@@ -6,9 +6,9 @@ from learnetV2_1.settings import STATIC_URL,STATICFILES_DIRS,MEDIA_URL,MEDIA_ROO
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('userlog.urls')),
-    path('',include('student.urls')),
-    path('',include('teacher.urls')),
-    path('',include('course.urls')),
+    path('student/',include('student.urls')),
+    path('teacher/',include('teacher.urls')),
+    path('course/',include('course.urls')),
 ]
 
 urlpatterns += static(STATIC_URL,document_root=STATICFILES_DIRS)

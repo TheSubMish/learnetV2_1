@@ -24,7 +24,7 @@
                 </div>
               </div>
               <div class="many-course-enroll">
-                <a href="/course/{{ course.slug }}" class="enroll">Enroll</a>
+                <a href="{% url "enroll" course.slug %}" class="enroll">Enroll</a>
               </div>
             </div>
           {% endfor %}
